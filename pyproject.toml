@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ua-batteries"                    # package distribution name (can have hyphen)
+version = "0.1.0"
+description = "A lightweight Python package for analyzing and modeling battery data."
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [{ name = "Your Name", email = "you@example.com" }]
+requires-python = ">=3.8"
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/mathseuler/ua-batteries"
+Issues = "https://github.com/mathseuler/ua-batteries/issues"
+
+# ---- Tell setuptools exactly where your importable package lives ----
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["ua_batteries*"]

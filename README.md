@@ -36,7 +36,7 @@ Follow these steps to set up and run the project from scratch, even if you don't
    cd ua-batteries
    ```
 
-### Step 4: Open in VS Code
+### SKIP: Step 4: Open in VS Code
 
 1. In Command Prompt (still in the `ua-batteries` folder), type:
    ```bash
@@ -44,7 +44,7 @@ Follow these steps to set up and run the project from scratch, even if you don't
    ```
    This opens the project in VS Code
 
-### Step 5: Create Virtual Environment
+### SKIP: Step 5: Create Virtual Environment
 
 1. In VS Code, open the Terminal (Ctrl + `)
 2. Run:
@@ -67,7 +67,7 @@ You should see `(.venv)` at the start of your terminal prompt.
 
 In the terminal, run:
 ```bash
-pip install -r requirements.txt
+pip install -e .
 ```
 
 ### Step 7: Set Environment Variables (Windows)
@@ -101,6 +101,11 @@ In the terminal (with venv activated and env vars set), run:
 
 ```bash
 python -m ua_batteries.visualization
+```
+Alternatively, you can just run
+
+```bash
+python ua_batteries/visulization.py
 ```
 
 This will:

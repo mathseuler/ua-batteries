@@ -352,7 +352,7 @@ if __name__ == "__main__":
     # Create visualization
     print("\nRunning optimization (this may take a moment)...")
     viz = create_optimization_visualization(
-        df, method="dp", max_buys=3, max_sells=3, capacity=100, power=50
+        df, method="dp", max_buys=MAX_BUYS, max_sells=MAX_SELLS, capacity=CAPACITY, power=POWER
     )
 
     # Export to HTML and open in browser

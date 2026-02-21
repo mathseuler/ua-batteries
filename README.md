@@ -154,3 +154,19 @@ black ua_batteries tests
 pip install -r requirements-dev.txt
 ```
 
+# Important Note
+
+If you'd like to generate report for any other months than the current one, go to utils/get_file.py and direct yourself to line 18:
+
+```python
+payload = {"date": month_year, "market": market, "zone": zone}  # month_year is of form %m.%Y i.e. 02.2026 - you can change it to be any month / year. 01.2026 will produce January 2026, for example.
+```
+
+You can change variable <code>month_year</code> into any other month.year combo, i.e. changing it to "05.2025" will produce result for May, 2025:
+
+>EXAMPLE:
+```python
+payload = {"date": "05.2025", "market": market, "zone": zone}
+```
+
+Later the functionality will be added to do it dynamically.

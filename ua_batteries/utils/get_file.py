@@ -15,7 +15,7 @@ def get_file(month_year=REQUEST_DAY, market=MARKET, zone=ZONE, lang="Ukrainian")
     OREE: https://www.oree.com.ua/index.php/pricectr?lang=ukr
     Change lang to 'English' for English file.
     """
-    payload = {"date": month_year, "market": market, "zone": zone}
+    payload = {"date": month_year, "market": market, "zone": zone}  # month_year is of form %m.%Y i.e. 02.2026 - you can change it to be any month / year. 01.2026 will produce January 2026, for example.
     response = requests.post(URL, data=payload, headers=HEADERS[lang])
 
     if response.status_code != 200:

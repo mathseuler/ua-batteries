@@ -3,14 +3,18 @@
 
 -r requirements.txt
 
+# Task Automation
+tox>=4.11
+
 # Testing
 pytest>=8.0
 pytest-cov>=4.0
 
-# Code formatting
-black>=23.0
+# The "All-in-One" Linter & Formatter
+ruff>=0.5.1
 
-# Code linting
-flake8>=6.0
-flake8-docstrings>=1.7
-pep8-naming>=0.13
+# Project Meta Formatting
+pyproject-fmt>=2.1.4
+
+# Type Checking
+mypy>=1.11.0

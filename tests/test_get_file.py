@@ -1,7 +1,10 @@
 """Tests for file download and parsing functionality."""
-import pytest
-import pandas as pd
+
 from unittest.mock import Mock, patch
+
+import pandas as pd
+import pytest
+
 from ua_batteries.utils.get_file import download_file, get_file
 
 

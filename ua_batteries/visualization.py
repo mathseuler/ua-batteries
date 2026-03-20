@@ -1,23 +1,24 @@
 """Visualization and HTML export for optimization results."""
-import pandas as pd
-import webbrowser
+
 import os
 import tempfile
-from datetime import datetime, timedelta
+import webbrowser
+from datetime import datetime
+
+import pandas as pd
+
+from ua_batteries.config import CAPACITY, MAX_BUYS, MAX_SELLS, POWER
 from ua_batteries.main import add_optimization_to_dataframe
-from ua_batteries.config import MAX_BUYS, MAX_SELLS, CAPACITY, POWER
 
 
 def create_optimization_visualization(
     df,
-    method="dp",
     max_buys=MAX_BUYS,
     max_sells=MAX_SELLS,
     capacity=CAPACITY,
     power=POWER,
 ):
-    """
-    Create a visualization of the buy/sell optimization strategy.
+    """Create a visualization of the buy/sell optimization strategy.
 
     Shows a table with:
     - Rows: dates
@@ -26,18 +27,23 @@ def create_optimization_visualization(
     - RHS: total profit for each day
 
     Args:
+    ----
         df: DataFrame from get_file() with prices for 24 hours per day
-        method: 'dp' for dynamic programming, 'lp' for linear programming
-        max_buys, max_sells, capacity, power: optimization parameters
+        df: DataFrame from get_file() with prices for 24 hours per day.
+        max_buys: Maximum number of buy operations allowed.
+        max_sells: Maximum number of sell operations allowed.
+        capacity: Total battery capacity in MWh.
+        power: Battery power rating in MWh.
 
     Returns:
+    -------
         pd.DataFrame: Visualization dataframe with styling applied
+
     """
     # Run optimization if not already done
     if "Buy_hours" not in df.columns:
         df = add_optimization_to_dataframe(
             df,
-            method=method,
             max_buys=max_buys,
             max_sells=max_sells,
             capacity=capacity,
@@ -61,14 +67,14 @@ def create_optimization_visualization(
             for buy_id, buy_info in buy_hours.items():
                 hour = buy_info["hour"]
                 amount = buy_info["buy_amount"]
-                viz_df.at[idx, f"Hour {hour + 1}"] = f"BUY\n{amount:.1f}MWh"
+                viz_df.at[idx, f"Hour {hour + 1}"] = f"BUY\n{amount:.2f}MWh"
 
         # Mark sell hours
         if sell_hours:
             for sell_id, sell_info in sell_hours.items():
                 hour = sell_info["hour"]
                 amount = sell_info["sell_amount"]
-                viz_df.at[idx, f"Hour {hour + 1}"] = f"SELL\n{amount:.1f}MWh"
+                viz_df.at[idx, f"Hour {hour + 1}"] = f"SELL\n{amount:.2f}MWh"
 
     # Add total profit column on RHS
     viz_df["Total Profit"] = df["Total_profit"].values
@@ -77,23 +83,25 @@ def create_optimization_visualization(
 
 
 def style_visualization(viz_df, df):
-    """
-    Apply styling to the visualization dataframe.
+    """Apply styling to the visualization dataframe.
 
     - Green background for buy hours
     - Red background for sell hours
     - Bold text for profit column
 
     Args:
+    ----
         viz_df: Visualization dataframe from create_optimization_visualization
         df: Original optimized dataframe with Buy_hours and Sell_hours
 
     Returns:
+    -------
         Styled dataframe (can be displayed in Jupyter or exported to HTML)
+
     """
 
     def color_cells(val, df_row_idx, col_name):
-        """Color cells based on buy/sell status"""
+        """Color cells based on buy/sell status."""
         if col_name == "Total Profit":
             return "font-weight: bold"
 
@@ -127,29 +135,31 @@ def style_visualization(viz_df, df):
 
 def display_visualization(
     df,
-    method="dp",
     max_buys=MAX_BUYS,
     max_sells=MAX_SELLS,
     capacity=CAPACITY,
     power=POWER,
     return_styled=False,
 ):
-    """
-    Create and display the optimization visualization.
+    """Create and display the optimization visualization.
 
     Args:
+    ----
         df: DataFrame from get_file()
-        method: 'dp' or 'lp'
-        max_buys, max_sells, capacity, power: optimization parameters
+        max_buys: Maximum number of buy operations allowed.
+        max_sells: Maximum number of sell operations allowed.
+        capacity: Total battery capacity in MWh.
+        power: Battery power rating in MWh.
         return_styled: If True, return styled dataframe; if False, return plain dataframe
 
     Returns:
+    -------
         pd.DataFrame or Styled DataFrame
+
     """
     # Run optimization if needed
     optimized_df = add_optimization_to_dataframe(
         df,
-        method=method,
         max_buys=max_buys,
         max_sells=max_sells,
         capacity=capacity,
@@ -159,7 +169,6 @@ def display_visualization(
     # Create visualization
     viz_df = create_optimization_visualization(
         optimized_df,
-        method=method,
         max_buys=max_buys,
         max_sells=max_sells,
         capacity=capacity,
@@ -172,20 +181,20 @@ def display_visualization(
         return viz_df
 
 
-def export_to_html(
-    viz_df, original_df, title="Energy Trading Optimization", open_browser=True
-):
-    """
-    Export visualization to styled HTML file with prices and optionally open in browser.
+def export_to_html(viz_df, original_df, title="Energy Trading Optimization", open_browser=True):
+    """Export visualization to styled HTML file with prices and optionally open in browser.
 
     Args:
+    ----
         viz_df: Visualization dataframe from create_optimization_visualization
         original_df: Original dataframe with prices from get_file()
         title: Title for the HTML page
         open_browser: If True, open the HTML file in default browser
 
     Returns:
+    -------
         str: Path to the generated HTML file
+
     """
     # Create styled HTML
     html_string = f"""
@@ -345,20 +354,17 @@ def export_to_html(
 
 
 if __name__ == "__main__":
+    from ua_batteries.config import REQUEST_DAY
     from ua_batteries.utils.get_file import get_file
 
     df = get_file()
 
     # Create visualization
     print("\nRunning optimization (this may take a moment)...")
-    viz = create_optimization_visualization(
-        df, method="dp", max_buys=MAX_BUYS, max_sells=MAX_SELLS, capacity=CAPACITY, power=POWER
-    )
+    viz = create_optimization_visualization(df, max_buys=MAX_BUYS, max_sells=MAX_SELLS, capacity=CAPACITY, power=POWER)
 
     # Export to HTML and open in browser
-    today = (datetime.today() + timedelta(days=1)).strftime("%B %Y")
-    html_path = export_to_html(
-        viz, df, title=f"Energy Trading Optimization - {today}", open_browser=True
-    )
+    date = datetime.strptime(REQUEST_DAY, "%m.%Y").strftime("%B %Y")
+    html_path = export_to_html(viz, df, title=f"Energy Trading Optimization - {date}", open_browser=True)
     print("\nVisualization complete!")
     print(f"Total profit for period: {viz['Total Profit'].sum():.2f}")

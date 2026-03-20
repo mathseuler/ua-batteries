@@ -1,10 +1,13 @@
 """Tests for visualization functionality."""
-import pandas as pd
+
 import os
+
+import pandas as pd
+
 from ua_batteries.visualization import (
     create_optimization_visualization,
-    export_to_html,
     display_visualization,
+    export_to_html,
 )
 
 
@@ -24,7 +27,7 @@ class TestCreateOptimizationVisualization:
         df["Sell_hours"] = [{}, {}]
         df["Total_profit"] = [100.0, 200.0]
 
-        result = create_optimization_visualization(df, method="dp")
+        result = create_optimization_visualization(df)
 
         assert isinstance(result, pd.DataFrame)
 
@@ -121,14 +124,10 @@ class TestExportToHTML:
 
     def test_html_file_created(self):
         """Test that HTML file is created."""
-        viz_df = pd.DataFrame(
-            {f"Hour {i}": [""] for i in range(1, 25)}, index=["2026-02-01"]
-        )
+        viz_df = pd.DataFrame({f"Hour {i}": [""] for i in range(1, 25)}, index=["2026-02-01"])
         viz_df["Total Profit"] = [100.0]
 
-        original_df = pd.DataFrame(
-            {str(i): [10.0] for i in range(1, 25)}, index=["2026-02-01"]
-        )
+        original_df = pd.DataFrame({str(i): [10.0] for i in range(1, 25)}, index=["2026-02-01"])
 
         html_path = export_to_html(viz_df, original_df, open_browser=False)
 
@@ -137,18 +136,12 @@ class TestExportToHTML:
 
     def test_html_contains_content(self):
         """Test that generated HTML has expected content."""
-        viz_df = pd.DataFrame(
-            {f"Hour {i}": [""] for i in range(1, 25)}, index=["2026-02-01"]
-        )
+        viz_df = pd.DataFrame({f"Hour {i}": [""] for i in range(1, 25)}, index=["2026-02-01"])
         viz_df["Total Profit"] = [100.0]
 
-        original_df = pd.DataFrame(
-            {str(i): [10.0] for i in range(1, 25)}, index=["2026-02-01"]
-        )
+        original_df = pd.DataFrame({str(i): [10.0] for i in range(1, 25)}, index=["2026-02-01"])
 
-        html_path = export_to_html(
-            viz_df, original_df, title="Test Visualization", open_browser=False
-        )
+        html_path = export_to_html(viz_df, original_df, title="Test Visualization", open_browser=False)
 
         with open(html_path, "r", encoding="utf-8") as f:
             content = f.read()
@@ -160,16 +153,12 @@ class TestExportToHTML:
 
     def test_html_has_buy_sell_styling(self):
         """Test that HTML includes buy/sell styling."""
-        viz_df = pd.DataFrame(
-            {f"Hour {i}": [""] for i in range(1, 25)}, index=["2026-02-01"]
-        )
+        viz_df = pd.DataFrame({f"Hour {i}": [""] for i in range(1, 25)}, index=["2026-02-01"])
         viz_df.loc["2026-02-01", "Hour 6"] = "BUY\n50"
         viz_df.loc["2026-02-01", "Hour 11"] = "SELL\n50"
         viz_df["Total Profit"] = [100.0]
 
-        original_df = pd.DataFrame(
-            {str(i): [10.0] for i in range(1, 25)}, index=["2026-02-01"]
-        )
+        original_df = pd.DataFrame({str(i): [10.0] for i in range(1, 25)}, index=["2026-02-01"])
 
         html_path = export_to_html(viz_df, original_df, open_browser=False)
 
@@ -192,7 +181,7 @@ class TestDisplayVisualization:
             index=["2026-02-01"],
         )
 
-        result = display_visualization(df, method="dp")
+        result = display_visualization(df)
 
         assert isinstance(result, pd.DataFrame)
 

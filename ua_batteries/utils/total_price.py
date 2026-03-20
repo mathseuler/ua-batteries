@@ -3,9 +3,9 @@
 
 def total_buy_price(price):
     """Calculate total buy price including commission."""
-    return price * 1.0066
+    return 1.05 * price
 
 
 def total_sell_price(price):
     """Calculate total sell price minus commission."""
-    return price
+    return 0.95 * price

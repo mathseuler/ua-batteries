@@ -1,22 +1,27 @@
 """File download and parsing utilities."""
-import requests
-import pandas as pd
-from bs4 import BeautifulSoup
-from datetime import datetime
-import os
 
-from ua_batteries.config import URL, HEADERS, SAVE_FOLDER, MARKET, ZONE, REQUEST_DAY
+import os
+from datetime import datetime
+
+import pandas as pd
+import requests
+from bs4 import BeautifulSoup
+
+from ua_batteries.config import HEADERS, MARKET, REQUEST_DAY, SAVE_FOLDER, URL, ZONE
 
 
 def get_file(month_year=REQUEST_DAY, market=MARKET, zone=ZONE, lang="Ukrainian"):
-    """
-    Get latest available file from OREE website.
+    """Get latest available file from OREE website.
 
     OREE: https://www.oree.com.ua/index.php/pricectr?lang=ukr
     Change lang to 'English' for English file.
     """
-    payload = {"date": month_year, "market": market, "zone": zone}  # month_year is of form %m.%Y i.e. 02.2026 - you can change it to be any month / year. 01.2026 will produce January 2026, for example.
-    response = requests.post(URL, data=payload, headers=HEADERS[lang])
+    payload = {
+        "date": month_year,
+        "market": market,
+        "zone": zone,
+    }  # month_year is of form %m.%Y i.e. 02.2026 - you can change it to be any month / year. 01.2026 will produce January 2026, for example.  # noqa: E501
+    response = requests.post(URL, data=payload, headers=HEADERS[lang], verify=False)
 
     if response.status_code != 200:
         print("Request failed:", response.status_code)

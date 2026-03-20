@@ -1,8 +1,9 @@
 """Pytest configuration and shared fixtures for ua_batteries tests."""
 
-import pytest
-import pandas as pd
 import os
+
+import pandas as pd
+import pytest
 
 # Set environment variables for config before importing ua_batteries modules
 # Using smaller values for tests to avoid timeout in DP algorithm

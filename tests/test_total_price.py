@@ -1,4 +1,5 @@
 """Tests for pricing calculations."""
+
 from ua_batteries.utils.total_price import total_buy_price, total_sell_price
 
 

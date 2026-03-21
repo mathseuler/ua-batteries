@@ -2,7 +2,9 @@
 
 import os
 from datetime import datetime
+from io import StringIO
 
+import certifi
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
@@ -21,26 +23,72 @@ def get_file(month_year=REQUEST_DAY, market=MARKET, zone=ZONE, lang="Ukrainian")
         "market": market,
         "zone": zone,
     }  # month_year is of form %m.%Y i.e. 02.2026 - you can change it to be any month / year. 01.2026 will produce January 2026, for example.  # noqa: E501
-    response = requests.post(URL, data=payload, headers=HEADERS[lang], verify=False)
 
-    if response.status_code != 200:
-        print("Request failed:", response.status_code)
-        raise Exception(f"Failed to fetch data: HTTP {response.status_code}")
-    data = response.json()
+    if lang not in HEADERS:
+        raise ValueError(f"Unsupported language: {lang}. Expected one of: {list(HEADERS)}")
+
+    try:
+        response = requests.post(
+            URL,
+            data=payload,
+            headers=HEADERS[lang],
+            timeout=10,
+            verify=certifi.where(),
+        )
+        response.raise_for_status()
+    except requests.exceptions.SSLError as e:
+        raise RuntimeError("SSL verification failed. Check certificates.") from e
+    except requests.exceptions.HTTPError as e:
+        raise RuntimeError(f"HTTP Error occurred: {e}") from e
+    except requests.exceptions.RequestException as e:
+        raise RuntimeError(f"Request failed: {e}") from e
+
+    try:
+        data = response.json()
+    except ValueError as e:
+        raise RuntimeError("Invalid API response: response body is not a valid JSON") from e
+    # JSON Validation
+    if not isinstance(data, dict):
+        raise RuntimeError("Invalid API response: expected JSON object")
+
+    if "content" not in data:
+        raise RuntimeError("Invalid API response: missing 'content'")
 
     html_table = data["content"]
+
+    # HTML Validation
     soup = BeautifulSoup(html_table, "html.parser")
     table = soup.find("table")
 
-    # pd.read_html() always returns a list since html can have multiple tables
-    # Extract the dataframe with [0]
-    df = pd.read_html(str(table))[0].set_index("Дата")
+    if table is None:
+        raise RuntimeError("Invalid API response: no table found in HTML")
+
+    # DataFrame parsing
+    df = pd.read_html(StringIO(str(table)))[0]
+    if "Дата" not in df.columns:
+        raise RuntimeError("Invalid data: missing 'Дата' column")
+
+    # DataFrame Validation
+    expected_hours = [str(i) for i in range(1, 25)]
+
+    missing_hours = [h for h in expected_hours if h not in df.columns]
+    if missing_hours:
+        raise RuntimeError(f"Invalid data: missing hour columns: {missing_hours}")
+
+    if df.empty:
+        raise RuntimeError("Invalid data: empty dataframe")
+
+    if df[expected_hours].isnull().any().any():
+        raise RuntimeError("Invalid data: contains NaN values")
+
+    df = df.set_index("Дата")
+
     return df
 
 
 def download_file(month_year=REQUEST_DAY):
     """Download and save prices to CSV file."""
-    df = get_file()
+    df = get_file(month_year=month_year)
 
     os.makedirs(SAVE_FOLDER, exist_ok=True)
 
@@ -48,7 +96,7 @@ def download_file(month_year=REQUEST_DAY):
     filename = f"{create_file_time}_oree_prices_{month_year.replace('.', '_')}.csv"
     filepath = os.path.join(SAVE_FOLDER, filename)
 
-    df.to_csv(filepath, index=False)
+    df.to_csv(filepath, index_label="Дата")
 
     print(f"Saved to {filepath}")
 

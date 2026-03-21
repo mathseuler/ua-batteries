@@ -5,6 +5,24 @@ from ua_batteries.utils.get_file import get_file
 from ua_batteries.utils.total_price import total_buy_price, total_sell_price
 
 
+def _validate_optimization_inputs(prices, max_buys, max_sells, capacity, power):
+    """Validate optimization inputs before solving."""
+    if len(prices) != 24:
+        raise ValueError("prices must contain exactly 24 hourly values")
+
+    if max_buys < 0:
+        raise ValueError("max_buys must be non-negative")
+
+    if max_sells < 0:
+        raise ValueError("max_sells must be non-negative")
+
+    if capacity <= 0:
+        raise ValueError("capacity must be greater than 0")
+
+    if power <= 0:
+        raise ValueError("power must be greater than 0")
+
+
 def optimize_day_lp(prices, max_buys=MAX_BUYS, max_sells=MAX_SELLS, capacity=CAPACITY, power=POWER):
     """Optimize buy/sell strategy for a single day using Linear Programming.
 
@@ -23,10 +41,11 @@ def optimize_day_lp(prices, max_buys=MAX_BUYS, max_sells=MAX_SELLS, capacity=CAP
     """
     try:
         from pulp import LpMaximize, LpProblem, LpVariable, lpSum, value  # type: ignore
-    except ImportError:
-        raise ImportError("Please install pulp: pip install pulp")
+    except ImportError as e:
+        raise ImportError("Please install pulp: pip install pulp") from e
 
     prices = list(prices)
+    _validate_optimization_inputs(prices, max_buys, max_sells, capacity, power)
     n_hours = len(prices)
 
     # Create LP problem

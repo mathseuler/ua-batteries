@@ -14,9 +14,8 @@ from openpyxl import Workbook
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
 
-from ua_batteries.config import CAPACITY, MAX_BUYS, MAX_SELLS, POWER, SAVE_FOLDER
+from ua_batteries.config import CAPACITY, MAX_BUYS, MAX_SELLS, POWER
 from ua_batteries.main import add_optimization_to_dataframe
-
 
 GREEN_FILL = PatternFill(fill_type="solid", fgColor="90EE90")
 RED_FILL = PatternFill(fill_type="solid", fgColor="FFB6C1")

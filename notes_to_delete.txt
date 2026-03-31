@@ -1,7 +1,0 @@
-1. in lpSum() do not use [] for list comprehension - instead use a generator comprehension, i.e.
-
-model += lpSum(cost[i]*variables[i] for i in ["C", "S"]) instead of model += lpSum([cost[i]*variables[i] for i in ["C", "S"]])
-
-apparently it's faster in production - ask GPT for context
-
-2. in LpVariable() definitions. Define them through LpVariable.dicts() instead of for looping the buy_hours and whatnot. This is way cleaner, and looks way nicer

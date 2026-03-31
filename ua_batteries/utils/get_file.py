@@ -79,7 +79,7 @@ def get_file(month_year=REQUEST_DAY, market=MARKET, zone=ZONE, lang="Ukrainian")
         raise RuntimeError("Invalid data: empty dataframe")
 
     if df[expected_hours].isnull().any().any():
-        raise RuntimeError("Invalid data: contains NaN values")
+        df[expected_hours] = df[expected_hours].ffill(axis=1)  # Accounting for Daylight Savings months (hour transitions lose an hour)
 
     df = df.set_index("Дата")
 

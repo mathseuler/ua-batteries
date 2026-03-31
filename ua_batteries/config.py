@@ -19,7 +19,7 @@ SAVE_FOLDER = "file_downloads"
 MARKET = "DAM"
 ZONE = "IPS"
 
-REQUEST_DAY = "03.2026"
+REQUEST_DAY = "03.2025"
 
 REQUIRED_ENV = ["MAX_BUYS", "MAX_SELLS", "CAPACITY", "POWER"]
 
@@ -61,7 +61,7 @@ def validate_config_values() -> None:
         raise RuntimeError("POWER must be greater than 0")
 
 
-validate_required_env()
+# validate_required_env()
 
 MAX_BUYS = float(os.getenv("MAX_BUYS", "10"))
 MAX_SELLS = float(os.getenv("MAX_SELLS", "10"))

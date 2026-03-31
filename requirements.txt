@@ -4,3 +4,4 @@ beautifulsoup4>=4.14,<5.0
 lxml>=4.9,<5.0
 numpy>=1.24,<3.0
 pulp>=3.3,<3.4
+certifi>=2024.0.0

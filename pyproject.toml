@@ -21,14 +21,19 @@ classifiers = [
 
 dependencies = [
   "beautifulsoup4>=4.14,<5",
+  "certifi>=2024",
+  "fastapi>=0.135,<0.136",
+  "Jinja2>=3.1.6,<4",
   "lxml>=4.9,<5",
   "numpy>=1.24,<3",
+  "openpyxl>=3.1.5,<4",
   "pandas>=2.1,<3",
   "pulp>=3.3,<3.4",
+  "python-multipart>=0.0.22,<1",
   "requests>=2.32,<3",
+  "uvicorn>=0.42,<0.43",
 ]
 
-# FIX: This header is mandatory for extras to work
 optional-dependencies.lint = [
   "mypy==1.11",
   "pyproject-fmt>=2.1.4",
@@ -47,7 +52,6 @@ include = [ "ua_batteries*" ]
 target-version = "py312"
 line-length = 120
 
-# FIX: Rules must be under the .lint sub-table
 lint.select = [
   "D",
   "E",

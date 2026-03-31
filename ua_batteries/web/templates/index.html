@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UA Batteries</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/styles.css') }}">
+</head>
+<body>
+    <main class="page-shell">
+        <section class="hero">
+            <div class="hero-copy">
+                <span class="eyebrow">UA BATTERIES</span>
+                <h1>Battery arbitrage calculator for day-ahead Ukrainian energy prices</h1>
+                <p>
+                    Pick your trading parameters, run the optimizer, and download a client-friendly Excel report
+                    with highlighted buy and sell windows.
+                </p>
+            </div>
+            <div class="hero-glow" aria-hidden="true"></div>
+        </section>
+
+        <section class="calculator-card">
+            <div class="card-header">
+                <div>
+                    <h2>Run optimization</h2>
+                    <p>Local MVP - spreadsheet download only</p>
+                </div>
+                <div class="status-pill">Excel export enabled</div>
+            </div>
+
+            <form id="optimizer-form" class="form-grid" action="/download" method="post">
+                <label>
+                    <span>REQUEST_DAY</span>
+                    <input name="request_day" type="text" value="{{ defaults.request_day }}" placeholder="03.2026" required>
+                </label>
+
+                <label>
+                    <span>MAX_BUYS</span>
+                    <input name="max_buys" type="number" min="0" step="1" value="{{ defaults.max_buys }}" required>
+                </label>
+
+                <label>
+                    <span>MAX_SELLS</span>
+                    <input name="max_sells" type="number" min="0" step="1" value="{{ defaults.max_sells }}" required>
+                </label>
+
+                <label>
+                    <span>POWER</span>
+                    <input name="power" type="number" min="0.01" step="0.01" value="{{ defaults.power }}" required>
+                </label>
+
+                <label>
+                    <span>CAPACITY</span>
+                    <input name="capacity" type="number" min="0.01" step="0.01" value="{{ defaults.capacity }}" required>
+                </label>
+
+                <div class="form-note">
+                    <strong>Expected format:</strong> REQUEST_DAY should be <code>MM.YYYY</code>, for example
+                    <code>03.2026</code>.
+                </div>
+
+                <button id="download-btn" class="primary-btn" type="submit">
+                    Download Excel report
+                </button>
+            </form>
+
+            <div id="feedback" class="feedback" aria-live="polite"></div>
+        </section>
+    </main>
+
+    <script>
+        const form = document.getElementById("optimizer-form");
+        const button = document.getElementById("download-btn");
+        const feedback = document.getElementById("feedback");
+
+        form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            feedback.textContent = "Running optimization and preparing workbook...";
+            feedback.className = "feedback visible";
+            button.disabled = true;
+            button.textContent = "Preparing...";
+
+            try {
+                const formData = new FormData(form);
+                const response = await fetch(form.action, {
+                    method: "POST",
+                    body: formData,
+                });
+
+                if (!response.ok) {
+                    let message = "Download failed.";
+                    try {
+                        const data = await response.json();
+                        message = data.detail || message;
+                    } catch (err) {
+                    }
+                    throw new Error(message);
+                }
+
+                const blob = await response.blob();
+                const disposition = response.headers.get("content-disposition") || "";
+                const match = disposition.match(/filename="?([^"]+)"?/);
+                const filename = match ? match[1] : "energy_optimization.xlsx";
+
+                const url = window.URL.createObjectURL(blob);
+                const anchor = document.createElement("a");
+                anchor.href = url;
+                anchor.download = filename;
+                document.body.appendChild(anchor);
+                anchor.click();
+                anchor.remove();
+                window.URL.revokeObjectURL(url);
+
+                feedback.textContent = "Workbook downloaded.";
+                feedback.className = "feedback success visible";
+            } catch (error) {
+                feedback.textContent = error.message || "Something went wrong.";
+                feedback.className = "feedback error visible";
+            } finally {
+                button.disabled = false;
+                button.textContent = "Download Excel report";
+            }
+        });
+    </script>
+</body>
+</html>

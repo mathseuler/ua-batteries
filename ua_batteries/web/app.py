@@ -40,7 +40,7 @@ async def index(request: Request) -> HTMLResponse:
             "capacity": 100,
         },
     }
-    return templates.TemplateResponse("index.html", context)
+    return templates.TemplateResponse(request=request, name="index.html", context=context)
 
 
 @app.post("/download")
